@@ -31,7 +31,7 @@ export const CATEGORIES = [
     label: "Decor",
     items: [
       { id: "milk_can", label: "Milk can", source: "ground", node: "milk_can" },
-      { id: "ground.ground1", label: "Ground", source: "objects", node: "ground" },
+      { id: "ground", label: "Ground", source: "objects", node: "ground" },
     ],
   },
   {
@@ -45,7 +45,7 @@ export const CATEGORIES = [
   }
 ];
 
-export const NON_ROTARY_ITEMS = ["fence", "trough", "storage"];
+export const NON_ROTARY_ITEMS = ["fence", "trough", "storage", "ground"];
 
 /** Flat lookup by category id → items array */
 export const categoryById = Object.fromEntries(

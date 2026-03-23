@@ -7,7 +7,7 @@ import {
   getPlantFamilySet,
   getAnimalFamilySet,
   plantNodeForStage,
-  NON_ROTARY_ITEMS,
+  INITIAL_NON_ROTARY_ITEMS,
 } from "./catalog.js";
 import { playObjectSound } from "./sounds.js";
 import { ParticleBurst } from "./particle.js";
@@ -268,6 +268,9 @@ export async function createScene(mount) {
       case "cow_1":
         target = 2.3;
         break;
+      case "ground":
+        target = 2;
+        break;
       default:
         target = 1;
         break;
@@ -513,14 +516,19 @@ export async function createScene(mount) {
     if (!activeTool) return { ok: false, reason: "no-tool" };
 
     const key = templateKey(activeTool.source, activeTool.node);
-    const proto = templates.get(key);
+    let proto = templates.get(key);
     playObjectSound(activeTool.node); 
 
     if (!proto) return { ok: false, reason: "no-template" };
 
+    if (activeTool.node === "ground") {
+      const index = Math.round(Math.random() * 6);
+      proto = proto.children[index];
+    }
+
     const inst = cloneForPlacement(proto);
     inst.position.copy(hit.point);
-    if (!NON_ROTARY_ITEMS.includes(activeTool.node)) {
+    if (!INITIAL_NON_ROTARY_ITEMS.includes(activeTool.node)) {
       inst.rotation.y = Math.random() * Math.PI * 2;
     }
     scene.add(inst);
