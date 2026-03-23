@@ -7,7 +7,7 @@ import {
   getPlantFamilySet,
   getAnimalFamilySet,
   plantNodeForStage,
-  INITIAL_NON_ROTARY_ITEMS,
+  NON_ROTARY_ITEMS,
 } from "./catalog.js";
 import { playObjectSound } from "./sounds.js";
 import { ParticleBurst } from "./particle.js";
@@ -508,7 +508,9 @@ export async function createScene(mount) {
     const hit = hits[0];
     const existing = placedRootFromObject(hit.object);
     if (existing) {
-      existing.rotation.y += ROTATE_STEP;
+      if (!existing.name.includes("ground")) {
+        existing.rotation.y += ROTATE_STEP;
+      }
       resnapPlacedToGround(existing);
       return { ok: true, action: "rotate" };
     }
@@ -528,7 +530,7 @@ export async function createScene(mount) {
 
     const inst = cloneForPlacement(proto);
     inst.position.copy(hit.point);
-    if (!INITIAL_NON_ROTARY_ITEMS.includes(activeTool.node)) {
+    if (!NON_ROTARY_ITEMS.includes(activeTool.node)) {
       inst.rotation.y = Math.random() * Math.PI * 2;
     }
     scene.add(inst);
