@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"
+    />
+    <title>GardenMakeover — Playable</title>
+    <meta
+      name="description"
+      content="Interactive mini garden designer — playable ad for GardenMakeover."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+    <link rel="icon" href="./assets/icon.png" type="image/png" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.170.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.170.0/examples/jsm/",
+          "pixi.js": "https://cdn.jsdelivr.net/npm/pixi.js@7.4.2/dist/pixi.min.mjs"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <div id="three-root" aria-hidden="true"></div>
+      <div id="pixi-root"></div>
+      <div id="hud-top" aria-live="polite">
+        <div id="hud-time" class="hud-chip">Day 1 · 0s</div>
+        <div id="hud-score" class="hud-chip">$0</div>
+        <button type="button" id="hud-collect" class="hud-collect" disabled>
+          Collect
+        </button>
+      </div>
+      <div id="hint-bar">
+        <div id="hint-bar-inner">
+          Welcome! Pick a category, tap an item, then tap the garden to place it.
+        </div>
+      </div>
+      <div id="brand">
+        <img src="./assets/icon.png" alt="" width="28" height="28" />
+        <span>GardenMakeover</span>
+      </div>
+    </div>
+    <script type="module" src="./js/main.js"></script>
+  </body>
+</html>
