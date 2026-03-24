@@ -399,7 +399,6 @@ export async function createScene(mount) {
     const objectRegex = /^([a-z]+)_(\d+)$/i.exec(node);
     if (!objectRegex) return null;
     const objectName = objectRegex[1].toLowerCase();
-    console.log("M", objectName);
     if (plantFamilySet.has(objectName)) {
       return objectName;
     }

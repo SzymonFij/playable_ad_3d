@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 const loader = new THREE.TextureLoader();
-const base = window.location.pathname;
+const base = window.location.href;
 const texture1 = loader.load(base + 'assets/images/smoke.png');
 const texture2 = loader.load(base + 'assets/images/smoke_alpha.png');
 
