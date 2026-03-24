@@ -396,23 +396,24 @@ export async function createScene(mount) {
   }
 
   function plantFamilyFromToolNode(node) {
-    const m = /^([a-z]+)_(\d+)$/i.exec(node);
-    if (!m) return null;
-    const fam = m[1].toLowerCase();
-    if (plantFamilySet.has(fam)) {
-      return fam;
+    const objectRegex = /^([a-z]+)_(\d+)$/i.exec(node);
+    if (!objectRegex) return null;
+    const objectName = objectRegex[1].toLowerCase();
+    console.log("M", objectName);
+    if (plantFamilySet.has(objectName)) {
+      return objectName;
     }
-    if (animalFamilySet.has(fam)) {
-      return fam;
+    if (animalFamilySet.has(objectName)) {
+      return objectName;
     }
     return null;
   }
 
   function swapPlacedPlant(oldRoot, newNodeName) {
-    const k = templateKey("objects", newNodeName);
-    const proto = templates.get(k);
+    const key = templateKey("objects", newNodeName);
+    const proto = templates.get(key);
     if (!proto) {
-      console.warn("Missing plant stage template:", k);
+      console.warn("Missing plant stage template:", key);
       return;
     }
     const idx = placed.indexOf(oldRoot);
@@ -450,26 +451,26 @@ export async function createScene(mount) {
       root.position.y += 0.08;
       scene.add(root);
     } else {
-      const g = new THREE.Group();
-      const mat = new THREE.MeshStandardMaterial({
+      const group = new THREE.Group();
+      const material = new THREE.MeshStandardMaterial({
         color: 0xf2c14e,
         metalness: 0.55,
         roughness: 0.38,
       });
       const coin = new THREE.Mesh(
         new THREE.CylinderGeometry(0.2, 0.2, 0.05, 18),
-        mat
+        material
       );
       coin.rotation.x = Math.PI / 2;
       coin.castShadow = true;
-      g.add(coin);
-      const c2 = coin.clone();
-      c2.position.set(0.1, 0.05, 0.05);
-      g.add(c2);
-      g.position.copy(at);
-      g.position.y += 0.12;
-      scene.add(g);
-      root = g;
+      group.add(coin);
+      const coins = coin.clone();
+      coins.position.set(0.1, 0.05, 0.05);
+      group.add(coins);
+      group.position.copy(at);
+      group.position.y += 0.12;
+      scene.add(group);
+      root = group;
     }
     moneyMarkers.push(root);
   }
@@ -712,15 +713,15 @@ export async function createScene(mount) {
     }
 
     for (let i = placementAnimations.length - 1; i >= 0; i--) {
-      const a = placementAnimations[i];
-      a.t += dt * 4.2;
-      const u = Math.min(1, a.t);
+      const anim = placementAnimations[i];
+      anim.t += dt * 4.2;
+      const u = Math.min(1, anim.t);
       const k = 1 - Math.pow(1 - u, 3);
-      a.obj.scale.lerpVectors(a.startS, a.endS, k);
-      const bounce = Math.sin(u * Math.PI) * a.lift * (1 - u);
-      a.obj.position.y = a.baseY + bounce;
+      anim.obj.scale.lerpVectors(anim.startS, anim.endS, k);
+      const bounce = Math.sin(u * Math.PI) * anim.lift * (1 - u);
+      anim.obj.position.y = anim.baseY + bounce;
       if (u >= 1) {
-        a.obj.position.y = a.baseY;
+        anim.obj.position.y = anim.baseY;
         placementAnimations.splice(i, 1);
       }
     }

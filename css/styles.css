@@ -1,5 +1,3 @@
-/* GardenMakeover playable — mobile-first layout */
-
 :root {
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --ui-bar-height: min(220px, 32vh);

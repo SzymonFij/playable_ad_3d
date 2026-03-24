@@ -1,7 +1,7 @@
 import { CATEGORIES, categoryById } from "./catalog.js";
 import { createScene } from "./scene3d.js";
 import { createPixiUI } from "./uiPixi.js";
-import { playTap, playTheme, playCollect } from "./sounds.js";
+import { playTap, playTheme, playCollect, playPlacement } from "./sounds.js";
 
 const hintBar = document.getElementById("hint-bar-inner");
 const threeMount = document.getElementById("three-root");
@@ -100,7 +100,7 @@ function handleGardenPointer(clientX, clientY) {
     } else {
       hint("Placed! Tap any piece to rotate it, or tap grass to add more.");
     }
-    playTap();
+    playPlacement();
   } else if (res.reason === "no-hit") {
     hint("Aim for the lawn or an existing piece.");
   } else if (res.reason === "no-tool") {
@@ -156,7 +156,6 @@ function finishTapGesture(e) {
 canvasEl.addEventListener("pointerup", finishTapGesture, { capture: true });
 canvasEl.addEventListener("pointercancel", finishTapGesture, { capture: true });
 canvasEl.addEventListener("click", playTheme, { once: true });
-canvasEl.addEventListener("touchstart", playTheme, {once: true});
 
 pixiMount.addEventListener("pointerdown", () => world.bumpViewActivity());
 

@@ -1,6 +1,7 @@
 const THEME = new URL("../assets/sounds/theme.mp3", import.meta.url).href;
 const CLICK_SOUND = new URL("../assets/sounds/click_003.mp3", import.meta.url).href;
 const COLLECT_SOUND = new URL("../assets/sounds/popup_chest.mp3", import.meta.url).href;
+const PLACE_SOUND = new URL("../assets/sounds/throw_spear.mp3", import.meta.url).href;
 
 const COW_SOUND = new URL("../assets/sounds/cow.mp3", import.meta.url).href;
 const CHICKEN_SOUND = new URL("../assets/sounds/chicken.mp3", import.meta.url).href;
@@ -33,5 +34,11 @@ export function playObjectSound(name) {
 export function playCollect() {
     const audio = new Audio(COLLECT_SOUND);
     audio.volume = 1;
+    void audio.play();
+}
+
+export function playPlacement() {
+    const audio = new Audio(PLACE_SOUND);
+    audio.volume = 0.4;
     void audio.play();
 }

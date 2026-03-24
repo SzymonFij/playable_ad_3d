@@ -1,14 +1,10 @@
 import * as PIXI from "pixi.js";
 import { CATEGORIES } from "./catalog.js";
 
-/**
- * @typedef {import('./catalog.js').CATEGORIES[number]['items'][number]} CatalogItem
- */
-
 function sizePixiToMount(app, mount) {
-  const w = mount.clientWidth || 320;
-  const h = mount.clientHeight || 220;
-  app.renderer.resize(w, h);
+  const width = mount.clientWidth || 320;
+  const height = mount.clientHeight || 220;
+  app.renderer.resize(width, height);
 }
 
 /**
@@ -36,7 +32,6 @@ export async function createPixiUI(mount, handlers) {
   app.stage.addChild(root);
 
   let selectedCategoryId = CATEGORIES[0].id;
-  /** @type {CatalogItem | null} */
   let selectedItem = CATEGORIES[0].items[0];
 
   const categoryRow = new PIXI.Container();
@@ -53,120 +48,135 @@ export async function createPixiUI(mount, handlers) {
       fontWeight: bold ? "700" : "600",
       fill: 0xf4fff8,
       align: "center",
+      wordWrap: true,
+      wordWrapWidth: 90
     });
   }
 
-  function pillBackground(w, h, active, mode) {
-    const g = new PIXI.Graphics();
+  function pillBackground(width, height, active, mode) {
+    const graphics = new PIXI.Graphics();
     const fill = active
       ? mode === "cat"
         ? 0x40916c
         : 0x52b788
       : 0x1b4332;
     const stroke = active ? 0xd8f3dc : 0x2d6a4f;
-    const lw = active ? 2 : 1;
-    g.lineStyle(lw, stroke, 0.9);
-    g.beginFill(fill, 0.95);
-    g.drawRoundedRect(0, 0, w, h, 14);
-    g.endFill();
-    return g;
+    const lineWidth = active ? 2 : 1;
+    graphics.lineStyle(lineWidth, stroke, 0.9);
+    graphics.beginFill(fill, 0.95);
+    graphics.drawRoundedRect(0, 0, width, height, 14);
+    graphics.endFill();
+    return graphics;
   }
 
-  function touchButton(w, h, onTap) {
-    const c = new PIXI.Container();
-    c.interactive = true;
-    c.cursor = "pointer";
-    c.hitArea = new PIXI.Rectangle(0, 0, w, h);
-    c.on("pointertap", () => onTap());
-    return c;
+  function touchButton(width, height, onTap) {
+    const container = new PIXI.Container();
+    container.interactive = true;
+    container.cursor = "pointer";
+    container.hitArea = new PIXI.Rectangle(0, 0, width, height);
+    container.on("pointertap", () => onTap());
+    return container;
   }
 
   function layout() {
     categoryRow.removeChildren();
     itemRow.removeChildren();
     utilRow.removeChildren();
-    for (const ch of [...root.children]) {
-      if (ch !== categoryRow && ch !== itemRow && ch !== utilRow) root.removeChild(ch);
+    for (const child of [...root.children]) {
+      if (child !== categoryRow && child !== itemRow && child !== utilRow) root.removeChild(child);
     }
 
     sizePixiToMount(app, mount);
 
-    const w = app.renderer.width;
-    const pad = Math.max(10, Math.min(14, w * 0.03));
+    const screenWidth = app.renderer.width;
+    const pad = Math.max(10, Math.min(14, screenWidth * 0.03));
     const gap = 8;
 
     let x = pad;
-    const yCat = pad;
-    const catH = 40;
-    for (const cat of CATEGORIES) {
-      const active = cat.id === selectedCategoryId;
-      const lab = makeLabel(cat.label.toUpperCase(), 11, true);
-      const pw = Math.max(92, lab.width + 26);
-      const wrap = touchButton(pw, catH, () => {
-        selectedCategoryId = cat.id;
-        selectedItem = cat.items[0];
-        handlers.onCategory(cat.id);
+    const categoryPositionY = pad;
+    const categoryHeight = 40;
+    for (const category of CATEGORIES) {
+      const active = category.id === selectedCategoryId;
+      const label = makeLabel(category.label.toUpperCase(), 11, true);
+      const buttonWidth = Math.max(92, label.width + 26);
+      const wrap = touchButton(buttonWidth, categoryHeight, () => {
+        selectedCategoryId = category.id;
+        selectedItem = category.items[0];
+        handlers.onCategory(category.id);
         layout();
       });
-      const bg = pillBackground(pw, catH, active, "cat");
-      lab.anchor.set(0.5);
-      lab.position.set(pw / 2, catH / 2);
-      wrap.addChild(bg, lab);
-      wrap.position.set(x, yCat);
+      const bg = pillBackground(buttonWidth, categoryHeight, active, "cat");
+      label.anchor.set(0.5);
+      label.position.set(buttonWidth / 2, categoryHeight / 2);
+      wrap.addChild(bg, label);
+      wrap.position.set(x, categoryPositionY);
       categoryRow.addChild(wrap);
-      x += pw + gap;
+      x += buttonWidth + gap;
     }
 
-    const cat = CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
-    let xi = pad;
-    const yIt = yCat + catH + gap + 4;
-    const chipH = 44;
-    const n = Math.max(1, cat.items.length);
-    const rowInner = w - pad * 2;
-    const iw = Math.max(92, Math.min(132, (rowInner - gap * (n - 1)) / n));
-    for (const it of cat.items) {
+    const maxWidth = app.screen.width - pad - gap;
+    if (categoryRow.width > maxWidth) {
+      const scale = maxWidth / categoryRow.width;
+      categoryRow.scale.set(scale);
+    }
+
+    const category = CATEGORIES.find((c) => c.id === selectedCategoryId) || CATEGORIES[0];
+    let itemPositionX = pad;
+    const itemPositionY = categoryPositionY + categoryHeight + gap + 4;
+    const labelHeight = 44;
+    const index = Math.max(1, category.items.length);
+    const rowInner = screenWidth - pad * 2;
+    const buttonWidth = Math.min(132, (maxWidth - pad - gap) / CATEGORIES.length, (rowInner - gap * (index - 1)) / index);
+    for (const it of category.items) {
       const active = selectedItem?.id === it.id;
-      const lab = makeLabel(it.label, 11, active);
-      const wrap = touchButton(iw, chipH, () => {
+      const label = makeLabel(it.label, 11, active);
+      const wrap = touchButton(buttonWidth, labelHeight, () => {
         selectedItem = it;
         handlers.onItem(it);
         layout();
       });
-      const bg = pillBackground(iw, chipH, active, "item");
-      lab.anchor.set(0.5);
-      lab.position.set(iw / 2, chipH / 2);
-      wrap.addChild(bg, lab);
-      wrap.position.set(xi, yIt);
+      const bg = pillBackground(buttonWidth, labelHeight, active, "item");
+      label.anchor.set(0.5);
+      label.position.set(buttonWidth / 2, labelHeight / 2);
+      wrap.addChild(bg, label);
+      wrap.position.set(itemPositionX, itemPositionY);
       itemRow.addChild(wrap);
-      xi += iw + gap;
+      itemPositionX += buttonWidth + gap;
     }
 
-    const yU = yIt + chipH + gap + 6;
-    const half = (w - pad * 2 - gap) / 2;
-    const uh = 40;
+    // if (itemRow.width > maxWidth) {
+    //   const scale = maxWidth / itemRow.width;
+    //   itemRow.scale.set(scale);
+    // }
+    itemRow.maxWidth = maxWidth;
+    itemRow.wrap = true;
 
-    const resetWrap = touchButton(half, uh, () => handlers.onReset());
-    const resetBg = pillBackground(half, uh, false, "item");
+    const wrapPositionY = itemPositionY + labelHeight + gap + 6;
+    const wrapPositionCenterX = (maxWidth - pad) / 2;
+    const textHeight = 40;
+
+    const resetWrap = touchButton(wrapPositionCenterX, textHeight, () => handlers.onReset());
+    const resetBg = pillBackground(wrapPositionCenterX, textHeight, false, "item");
     const resetTx = makeLabel("Clear garden", 12, false);
     resetTx.anchor.set(0.5);
-    resetTx.position.set(half / 2, uh / 2);
+    resetTx.position.set(wrapPositionCenterX / 2, textHeight / 2);
     resetWrap.addChild(resetBg, resetTx);
-    resetWrap.position.set(pad, yU);
+    resetWrap.position.set(pad, wrapPositionY);
 
-    const dnWrap = touchButton(half, uh, () => handlers.onDayNight());
-    const dnBg = pillBackground(half, uh, false, "item");
-    const dnTx = makeLabel("Day / Night", 12, false);
-    dnTx.anchor.set(0.5);
-    dnTx.position.set(half / 2, uh / 2);
-    dnWrap.addChild(dnBg, dnTx);
-    dnWrap.position.set(pad + half + gap, yU);
+    const dayNightButton = touchButton(wrapPositionCenterX, textHeight, () => handlers.onDayNight());
+    const dayNightButtonBackgroung = pillBackground(wrapPositionCenterX, textHeight, false, "item");
+    const dayNightButtonLabel = makeLabel("Day / Night", 12, false);
+    dayNightButtonLabel.anchor.set(0.5);
+    dayNightButtonLabel.position.set(wrapPositionCenterX / 2, textHeight / 2);
+    dayNightButton.addChild(dayNightButtonBackgroung, dayNightButtonLabel);
+    dayNightButton.position.set(pad + wrapPositionCenterX + gap, wrapPositionY);
 
-    utilRow.addChild(resetWrap, dnWrap);
+    utilRow.addChild(resetWrap, dayNightButton);
 
-    const strap = makeLabel("DESIGN YOUR DREAM GARDEN", 9, false);
-    strap.alpha = 0.78;
-    strap.position.set(pad, yU + uh + 6);
-    root.addChild(strap);
+    const additionalInfoLabel = makeLabel("DESIGN YOUR DREAM GARDEN", 9, false);
+    additionalInfoLabel.alpha = 0.78;
+    additionalInfoLabel.position.set(pad, wrapPositionY + textHeight + 6);
+    root.addChild(additionalInfoLabel);
   }
 
   layout();
