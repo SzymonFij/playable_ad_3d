@@ -1,9 +1,9 @@
 import * as THREE from "three";
 
 const loader = new THREE.TextureLoader();
-
-const texture1 = loader.load('../assets/images/smoke.png');
-const texture2 = loader.load('../assets/images/smoke_alpha.png');
+const base = window.location.pathname;
+const texture1 = loader.load(base + 'assets/images/smoke.png');
+const texture2 = loader.load(base + 'assets/images/smoke_alpha.png');
 
 export class ParticleBurst {
     constructor(scene) {
